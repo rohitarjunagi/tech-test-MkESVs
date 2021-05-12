@@ -26,5 +26,32 @@ describe('express', function () {
       .set('Authorization', 'Basic: bWF0dEBnbWFpbC5jb206dGhpcyBpcyBhIHZAbGlkIHBhc3N3b3JkIQ==');
       expect(res.statusCode).to.equal(200);
     });
+
+    it('should respond with 401 when called with invalid Authorization header value', async () => {
+      const res = await request(server)
+      .get('/basic-auth')
+      .set('Authorization', 'Basic: invalid_base64_header');
+      expect(res.statusCode).to.equal(401);
+    });
+
+    it('should respond with 401 when authentication header is not present', async () => {
+      const res = await request(server)
+      .get('/basic-auth')
+      expect(res.statusCode).to.equal(401);
+    });
+
+    it('should respond with 401 when authentication header does not contain authorization scheme ', async () => {
+      const res = await request(server)
+      .get('/basic-auth')
+      .set('Authorization', 'asdasdasd: invalid_base64_header');
+      expect(res.statusCode).to.equal(401);
+    });
+
+    it('should respond with 401 when authentication header does not contain base64 value ', async () => {
+      const res = await request(server)
+      .get('/basic-auth')
+      .set('Authorization', 'Basic: ');
+      expect(res.statusCode).to.equal(401);
+    });
   })
 });
